@@ -13,7 +13,7 @@ jobs:
       - name: Install dependencies
         run: |
           pacman -Syu --noconfirm archlinux-keyring git curl rust clang pkgconf \
-            cairo glib2 libdisplay-info libglvnd libinput libpipewire libxkbcommon \
+            cairo glib2 libdisplay-info libglvnd libinput libpipewire libxkbcommon libxkbcommon-x11 \
             mesa pango pixman seatd systemd-libs vulkan-icd-loader wayland
 
       - uses: actions/checkout@v6
