@@ -5,20 +5,20 @@ on:
 
 jobs:
   build:
-    name: build release binaries
+    name: build release binaries (arch)
     runs-on: ubuntu-24.04
+    container: archlinux:base-devel
 
     steps:
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm archlinux-keyring git curl rust clang pkgconf \
+            cairo glib2 libdisplay-info libglvnd libinput libpipewire libxkbcommon \
+            mesa pango pixman seatd systemd-libs vulkan-icd-loader wayland
+
       - uses: actions/checkout@v6
         with:
           show-progress: false
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y curl gcc clang libudev-dev libgbm-dev libxkbcommon-dev libxkbcommon-x11-dev libx11-dev libxcb1-dev libxcb-cursor-dev libegl1-mesa-dev libwayland-dev libinput-dev libdbus-1-dev libsystemd-dev libseat-dev libpipewire-0.3-dev libpango1.0-dev libdisplay-info-dev libadwaita-1-dev
-
-      - uses: dtolnay/rust-toolchain@stable
 
       - uses: Swatinem/rust-cache@v2
 
@@ -36,5 +36,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: clarion-linux-x86_64
+          name: clarion-arch-x86_64
           path: stage/
