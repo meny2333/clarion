@@ -1,0 +1,40 @@
+name: Build release binaries
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build release binaries
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          show-progress: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y curl gcc clang libudev-dev libgbm-dev libxkbcommon-dev libegl1-mesa-dev libwayland-dev libinput-dev libdbus-1-dev libsystemd-dev libseat-dev libpipewire-0.3-dev libpango1.0-dev libdisplay-info-dev libadwaita-1-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --locked --release -p clarion -p clarion-settings -p clarion-shell
+
+      - name: Stage artifacts
+        run: |
+          mkdir -p stage/bin stage/share/wayland-sessions stage/share/xdg-desktop-portal stage/lib/systemd/user
+          install -m755 target/release/clarion target/release/clarion-settings target/release/clarion-shell resources/clarion-session stage/bin/
+          install -m644 resources/clarion.desktop stage/share/wayland-sessions/
+          install -m644 resources/clarion-portals.conf stage/share/xdg-desktop-portal/
+          install -m644 resources/clarion.service resources/clarion-shell.service resources/clarion-shutdown.target stage/lib/systemd/user/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: clarion-linux-x86_64
+          path: stage/
